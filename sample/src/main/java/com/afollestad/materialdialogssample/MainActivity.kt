@@ -493,7 +493,7 @@ class MainActivity : AppCompatActivity() {
     R.id.input_message.onClickDebounced {
       MaterialDialog(this).show {
         title(R.string.useGoogleLocationServices)
-        message(R.string.useGoogleLocationServicesPrompt)
+        message(R.string.useGoogleLocationServicesPrompt_very_long_message)
         input(
             hint = "Type something",
             prefill = "Pre-filled!",

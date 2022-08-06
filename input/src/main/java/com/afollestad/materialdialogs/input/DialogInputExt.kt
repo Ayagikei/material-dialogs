@@ -41,7 +41,8 @@ typealias InputCallback = ((MaterialDialog, CharSequence) -> Unit)?
  *
  * @throws IllegalStateException if the dialog is not an input dialog.
  */
-@CheckResult fun MaterialDialog.getInputLayout(): TextInputLayout {
+@CheckResult
+fun MaterialDialog.getInputLayout(): TextInputLayout {
   val key = "[custom_view_input_layout]"
   return config[key] as? TextInputLayout ?: lookupInputLayout().also {
     config[key] = it
@@ -50,7 +51,7 @@ typealias InputCallback = ((MaterialDialog, CharSequence) -> Unit)?
 
 private fun MaterialDialog.lookupInputLayout(): TextInputLayout {
   return getCustomView().findViewById(R.id.md_input_layout) as? TextInputLayout
-      ?: throw IllegalStateException("You have not setup this dialog as an input dialog.")
+    ?: throw IllegalStateException("You have not setup this dialog as an input dialog.")
 }
 
 /**
@@ -58,9 +59,10 @@ private fun MaterialDialog.lookupInputLayout(): TextInputLayout {
  *
  * @throws IllegalStateException if the dialog is not an input dialog.
  */
-@CheckResult fun MaterialDialog.getInputField(): EditText {
+@CheckResult
+fun MaterialDialog.getInputField(): EditText {
   return getInputLayout().editText ?: throw IllegalStateException(
-      "You have not setup this dialog as an input dialog."
+    "You have not setup this dialog as an input dialog."
   )
 }
 
@@ -95,7 +97,7 @@ fun MaterialDialog.input(
   allowEmpty: Boolean = false,
   callback: InputCallback = null
 ): MaterialDialog {
-  customView(R.layout.md_dialog_stub_input)
+  customView(R.layout.md_dialog_stub_input, scrollable = true)
   onPreShow { showKeyboardIfApplicable() }
   if (!hasActionButtons()) {
     positiveButton(android.R.string.ok)
@@ -146,8 +148,8 @@ private fun MaterialDialog.prefillInput(
     onShow { editText.setSelection(prefillText.length) }
   }
   setActionButtonEnabled(
-      POSITIVE,
-      allowEmpty || prefillText.isNotEmpty()
+    POSITIVE,
+    allowEmpty || prefillText.isNotEmpty()
   )
 }
 
@@ -162,9 +164,9 @@ private fun MaterialDialog.styleInput(
   getInputLayout().hint = hint ?: if (hintRes != null) resources.getString(hintRes) else null
   editText.inputType = inputType
   editText.maybeSetTextColor(
-      windowContext,
-      attrRes = R.attr.md_color_content,
-      hintAttrRes = R.attr.md_color_hint
+    windowContext,
+    attrRes = R.attr.md_color_content,
+    hintAttrRes = R.attr.md_color_hint
   )
   bodyFont?.let(editText::setTypeface)
 }
