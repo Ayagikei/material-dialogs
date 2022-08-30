@@ -27,8 +27,8 @@ import com.afollestad.materialdialogs.MaterialDialog
  *
  * @param owner Optional lifecycle owner, if its null use windowContext.
  */
-fun MaterialDialog.lifecycleOwner(owner: LifecycleOwner? = null): MaterialDialog {
-  val observer = DialogLifecycleObserver(::dismiss)
+fun MaterialDialog.lifecycleOwner(owner: LifecycleOwner? = null, dismissOnPause: Boolean = false): MaterialDialog {
+  val observer = DialogLifecycleObserver(::dismiss, dismissOnPause)
   val lifecycleOwner = owner ?: (windowContext as? LifecycleOwner
       ?: throw IllegalStateException(
           "$windowContext is not a LifecycleOwner."

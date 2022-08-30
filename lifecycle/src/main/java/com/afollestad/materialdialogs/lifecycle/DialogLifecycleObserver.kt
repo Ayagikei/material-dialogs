@@ -22,9 +22,17 @@ import androidx.lifecycle.LifecycleObserver
 import androidx.lifecycle.OnLifecycleEvent
 
 /** @author @jordyamc */
-internal class DialogLifecycleObserver(private val dismiss: () -> Unit) : LifecycleObserver {
+internal class DialogLifecycleObserver(
+  private val dismiss: () -> Unit,
+  private val dismissOnPause: Boolean
+) : LifecycleObserver {
   @OnLifecycleEvent(Lifecycle.Event.ON_DESTROY)
   fun onDestroy() = dismiss()
+
   @OnLifecycleEvent(Lifecycle.Event.ON_PAUSE)
-  fun onPause() = dismiss()
+  fun onPause() {
+    if (dismissOnPause) {
+      dismiss()
+    }
+  }
 }
