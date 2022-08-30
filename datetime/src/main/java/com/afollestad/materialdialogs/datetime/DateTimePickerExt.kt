@@ -77,8 +77,10 @@ fun MaterialDialog.dateTimePicker(
       setActionButtonEnabled(
           POSITIVE, !requireFutureDateTime || futureTime
       )
-      if (autoFlipToTime && (!flipEvenSameDate  && didDateChange(previous, date))) {
-        getPager().currentItem = 1
+      if(autoFlipToTime){
+        if(flipEvenSameDate || didDateChange(previous, date)){
+          viewPager.currentItem = 1
+        }
       }
     }
   }
