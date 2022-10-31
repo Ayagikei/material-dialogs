@@ -409,6 +409,12 @@
         style="@style/SampleButton"
         />
 
+    <Button
+        android:id="@+id/datetime_picker_all_day"
+        android:text="DateTime Picker (all day)"
+        style="@style/SampleButton"
+        />
+
     <!-- Bottom Sheets -->
 
     <TextView

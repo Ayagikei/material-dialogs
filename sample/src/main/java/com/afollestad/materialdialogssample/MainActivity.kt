@@ -666,7 +666,7 @@ class MainActivity : AppCompatActivity() {
 
     R.id.date_picker.onClickDebounced {
       MaterialDialog(this).show {
-        datePicker { _, date ->
+        datePicker { _, date, _ ->
           toast("Selected date: ${date.formatDate()}")
         }
         debugMode(debugMode)
@@ -677,7 +677,7 @@ class MainActivity : AppCompatActivity() {
     R.id.time_picker.onClickDebounced {
       MaterialDialog(this).show {
         title(text = "Select Time")
-        timePicker { _, time ->
+        timePicker { _, time, _ ->
           toast("Selected time: ${time.formatTime()}")
         }
         debugMode(debugMode)
@@ -688,11 +688,22 @@ class MainActivity : AppCompatActivity() {
     R.id.datetime_picker.onClickDebounced {
       MaterialDialog(this).show {
         title(text = "Select Date and Time")
-        dateTimePicker(requireFutureDateTime = true) { _, dateTime ->
+        dateTimePicker(requireFutureDateTime = true) { _, dateTime, _ ->
           toast("Selected date/time: ${dateTime.formatDateTime()}")
         }
         debugMode(debugMode)
         lifecycleOwner(this@MainActivity)
+      }
+    }
+
+    R.id.datetime_picker_all_day.onClickDebounced {
+      MaterialDialog(this).show {
+        title(text = "Select Date and Time (all day)")
+        dateTimePicker(requireFutureDateTime = true, showAllDayOptions = true, defaultAllDay = true) { _, dateTime, _ ->
+          toast("Selected date/time: ${dateTime.formatDateTime()}")
+        }
+        lifecycleOwner(this@MainActivity)
+        debugMode(debugMode)
       }
     }
 
@@ -767,7 +778,7 @@ class MainActivity : AppCompatActivity() {
     R.id.bottomsheet_dateTimePicker.onClickDebounced {
       MaterialDialog(this, BottomSheet(WRAP_CONTENT)).show {
         title(text = "Select Date and Time")
-        dateTimePicker(requireFutureDateTime = true) { _, dateTime ->
+        dateTimePicker(requireFutureDateTime = true) { _, dateTime, _ ->
           toast("Selected date/time: ${dateTime.formatDateTime()}")
         }
         lifecycleOwner(this@MainActivity)

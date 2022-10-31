@@ -18,12 +18,16 @@
 package com.afollestad.materialdialogs.datetime
 
 import android.R.attr
+import android.view.View
 import androidx.annotation.CheckResult
+import androidx.viewpager.widget.ViewPager
 import com.afollestad.date.dayOfMonth
 import com.afollestad.materialdialogs.MaterialDialog
 import com.afollestad.materialdialogs.WhichButton.POSITIVE
+import com.afollestad.materialdialogs.actions.getActionButton
 import com.afollestad.materialdialogs.actions.setActionButtonEnabled
 import com.afollestad.materialdialogs.callbacks.onDismiss
+import com.afollestad.materialdialogs.checkbox.checkBoxPrompt
 import com.afollestad.materialdialogs.customview.customView
 import com.afollestad.materialdialogs.datetime.internal.DateTimePickerAdapter
 import com.afollestad.materialdialogs.datetime.internal.TimeChangeListener
@@ -39,7 +43,7 @@ import com.afollestad.materialdialogs.utils.MDUtil.isLandscape
 import com.afollestad.materialdialogs.utils.MDUtil.resolveColor
 import java.util.Calendar
 
-typealias DateTimeCallback = ((dialog: MaterialDialog, datetime: Calendar) -> Unit)?
+typealias DateTimeCallback = ((dialog: MaterialDialog, datetime: Calendar, isAllDay: Boolean) -> Unit)?
 
 /**
  * Makes the dialog a date and time picker.
@@ -52,13 +56,20 @@ fun MaterialDialog.dateTimePicker(
   show24HoursView: Boolean = false,
   autoFlipToTime: Boolean = true,
   flipEvenSameDate: Boolean = true,
+  showAllDayOptions: Boolean = false,
+  defaultAllDay: Boolean = false,
   dateTimeCallback: DateTimeCallback = null
 ): MaterialDialog {
+  var isAllDay = defaultAllDay
   customView(
       R.layout.md_datetime_picker_pager,
       noVerticalPadding = true,
       dialogWrapContent = windowContext.isLandscape()
   )
+  noAutoDismiss()
+  getTimePicker().isEnabled = !isAllDay
+  getPageIndicator()?.visibility = if(isAllDay) View.GONE else View.VISIBLE
+  getPager()?.isCanScroll = !isAllDay
 
   val viewPager = getPager().apply {
     adapter = DateTimePickerAdapter()
@@ -66,6 +77,38 @@ fun MaterialDialog.dateTimePicker(
   getPageIndicator()?.run {
     attachViewPager(viewPager)
     setDotTint(resolveColor(windowContext, attr = attr.textColorPrimary))
+  }
+
+
+
+  viewPager.addOnPageChangeListener(object : ViewPager.OnPageChangeListener{
+    override fun onPageScrolled(position: Int, positionOffset: Float, positionOffsetPixels: Int) {
+
+    }
+
+    override fun onPageSelected(position: Int) {
+      if(position == 0) {
+        getActionButton(POSITIVE).text = windowContext.getString(R.string.md_next)
+      }else{
+        getActionButton(POSITIVE).text = windowContext.getString(android.R.string.ok)
+      }
+    }
+
+    override fun onPageScrollStateChanged(state: Int) {
+
+    }
+  })
+
+  if(showAllDayOptions){
+    checkBoxPrompt(R.string.md_all_day, isCheckedDefault = defaultAllDay) { isChecked ->
+      isAllDay = isChecked
+      getTimePicker().isEnabled = !isAllDay
+      if(isChecked && viewPager.currentItem != 0){
+        viewPager.currentItem = 0
+      }
+      getPageIndicator()?.visibility = if(isChecked) View.GONE else View.VISIBLE
+      getPager()?.isCanScroll = !isAllDay
+    }
   }
 
   getDatePicker().apply {
@@ -77,7 +120,7 @@ fun MaterialDialog.dateTimePicker(
       setActionButtonEnabled(
           POSITIVE, !requireFutureDateTime || futureTime
       )
-      if(autoFlipToTime){
+      if(autoFlipToTime && !isAllDay){
         if(flipEvenSameDate || didDateChange(previous, date)){
           viewPager.currentItem = 1
         }
@@ -99,11 +142,17 @@ fun MaterialDialog.dateTimePicker(
     }
   }
 
-  positiveButton(android.R.string.ok) {
-    val selectedTime = toCalendar(getDatePicker(), getTimePicker())
-    dateTimeCallback?.invoke(it, selectedTime)
+  positiveButton(R.string.md_next) {
+    if(viewPager.currentItem == 1 || isAllDay) {
+      val selectedTime = toCalendar(getDatePicker(), getTimePicker())
+      dateTimeCallback?.invoke(it, selectedTime, isAllDay)
+    }else{
+      viewPager.currentItem = 1
+    }
   }
-  negativeButton(android.R.string.cancel)
+  negativeButton(android.R.string.cancel) {
+    dismiss()
+  }
 
   if (requireFutureDateTime) {
     val changeListener = TimeChangeListener(windowContext, getTimePicker()) {

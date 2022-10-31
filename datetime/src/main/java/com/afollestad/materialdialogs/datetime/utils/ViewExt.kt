@@ -23,6 +23,7 @@ import androidx.viewpager.widget.ViewPager
 import com.afollestad.date.DatePicker
 import com.afollestad.materialdialogs.MaterialDialog
 import com.afollestad.materialdialogs.datetime.R
+import com.afollestad.materialdialogs.datetime.internal.WrapContentViewPager
 import com.afollestad.viewpagerdots.DotsIndicator
 
 internal fun TimePicker.hour(): Int = if (isNougat()) hour else currentHour
@@ -41,7 +42,7 @@ internal fun MaterialDialog.getDatePicker() = findViewById<DatePicker>(R.id.date
 
 internal fun MaterialDialog.getTimePicker() = findViewById<TimePicker>(R.id.datetimeTimePicker)
 
-internal fun MaterialDialog.getPager() = findViewById<ViewPager>(R.id.dateTimePickerPager)
+internal fun MaterialDialog.getPager() = findViewById<WrapContentViewPager>(R.id.dateTimePickerPager)
 
 internal fun MaterialDialog.getPageIndicator() =
   findViewById<DotsIndicator?>(R.id.datetimePickerPagerDots)

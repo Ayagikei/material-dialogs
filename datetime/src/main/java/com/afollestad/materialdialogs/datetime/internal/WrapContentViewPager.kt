@@ -17,11 +17,13 @@ package com.afollestad.materialdialogs.datetime.internal
 
 import android.content.Context
 import android.util.AttributeSet
+import android.view.MotionEvent
 import android.view.View
 import android.view.View.MeasureSpec.EXACTLY
 import android.view.View.MeasureSpec.UNSPECIFIED
 import androidx.viewpager.widget.ViewPager
 import com.afollestad.materialdialogs.utils.MDUtil.ifNotZero
+
 
 internal class WrapContentViewPager(
   context: Context,
@@ -64,4 +66,15 @@ internal class WrapContentViewPager(
       each(child)
     }
   }
+
+  var isCanScroll = true
+
+  override fun onTouchEvent(ev: MotionEvent?): Boolean {
+    return isCanScroll && super.onTouchEvent(ev)
+  }
+
+  override fun onInterceptTouchEvent(ev: MotionEvent?): Boolean {
+    return isCanScroll && super.onInterceptTouchEvent(ev)
+  }
+
 }

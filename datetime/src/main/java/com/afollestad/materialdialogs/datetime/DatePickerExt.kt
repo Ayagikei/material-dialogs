@@ -69,7 +69,7 @@ fun MaterialDialog.datePicker(
 
   positiveButton(string.ok) {
     getDatePicker().getDate()?.let { datetime ->
-      dateCallback?.invoke(it, datetime)
+      dateCallback?.invoke(it, datetime, true)
     }
   }
   negativeButton(string.cancel)

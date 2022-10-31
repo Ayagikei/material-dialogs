@@ -63,7 +63,7 @@ fun MaterialDialog.timePicker(
   }
 
   positiveButton(android.R.string.ok) {
-    timeCallback?.invoke(it, getTimePicker().toCalendar())
+    timeCallback?.invoke(it, getTimePicker().toCalendar(), false)
   }
   negativeButton(android.R.string.cancel)
 
