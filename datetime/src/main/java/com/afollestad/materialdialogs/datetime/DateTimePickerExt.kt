@@ -168,6 +168,7 @@ fun MaterialDialog.dateTimePicker(
     if(viewPager.currentItem == 1 || isAllDay) {
       val selectedTime = toCalendar(getDatePicker(), getTimePicker())
       dateTimeCallback?.invoke(it, selectedTime, isAllDay)
+      dismiss()
     }else{
       viewPager.currentItem = 1
     }
