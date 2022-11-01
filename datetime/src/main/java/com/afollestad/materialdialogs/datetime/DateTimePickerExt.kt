@@ -23,6 +23,7 @@ import androidx.annotation.CheckResult
 import androidx.viewpager.widget.ViewPager
 import com.afollestad.date.dayOfMonth
 import com.afollestad.materialdialogs.MaterialDialog
+import com.afollestad.materialdialogs.WhichButton.NEGATIVE
 import com.afollestad.materialdialogs.WhichButton.POSITIVE
 import com.afollestad.materialdialogs.actions.getActionButton
 import com.afollestad.materialdialogs.actions.setActionButtonEnabled
@@ -36,8 +37,11 @@ import com.afollestad.materialdialogs.datetime.utils.getPageIndicator
 import com.afollestad.materialdialogs.datetime.utils.getPager
 import com.afollestad.materialdialogs.datetime.utils.getTimePicker
 import com.afollestad.materialdialogs.datetime.utils.hour
+import com.afollestad.materialdialogs.datetime.utils.init
 import com.afollestad.materialdialogs.datetime.utils.isFutureTime
 import com.afollestad.materialdialogs.datetime.utils.minute
+import com.afollestad.materialdialogs.datetime.utils.setMaxDate
+import com.afollestad.materialdialogs.datetime.utils.setMinDate
 import com.afollestad.materialdialogs.datetime.utils.toCalendar
 import com.afollestad.materialdialogs.utils.MDUtil.isLandscape
 import com.afollestad.materialdialogs.utils.MDUtil.resolveColor
@@ -68,8 +72,8 @@ fun MaterialDialog.dateTimePicker(
   )
   noAutoDismiss()
   getTimePicker().isEnabled = !isAllDay
-  getPageIndicator()?.visibility = if(isAllDay) View.GONE else View.VISIBLE
-  getPager()?.isCanScroll = !isAllDay
+  getPageIndicator()?.visibility = if (isAllDay) View.GONE else View.VISIBLE
+  getPager()?.isCanScroll = false
 
   val viewPager = getPager().apply {
     adapter = DateTimePickerAdapter()
@@ -80,18 +84,33 @@ fun MaterialDialog.dateTimePicker(
   }
 
 
+  fun onViewPagerChanged(position: Int) {
+    if (position == 0) {
+      getActionButton(NEGATIVE).text = windowContext.getString(android.R.string.cancel)
+      if (isAllDay) {
+        getActionButton(POSITIVE).text = windowContext.getString(android.R.string.ok)
+      } else {
+        getActionButton(POSITIVE).text = windowContext.getString(R.string.md_next)
+      }
+    } else {
+      getActionButton(NEGATIVE).text = windowContext.getString(R.string.md_previous)
+      getActionButton(POSITIVE).text = windowContext.getString(android.R.string.ok)
+    }
+  }
 
-  viewPager.addOnPageChangeListener(object : ViewPager.OnPageChangeListener{
+  fun switchPage(position: Int) {
+    viewPager.currentItem = position
+    onViewPagerChanged(position)
+  }
+
+
+  viewPager.addOnPageChangeListener(object : ViewPager.OnPageChangeListener {
     override fun onPageScrolled(position: Int, positionOffset: Float, positionOffsetPixels: Int) {
 
     }
 
     override fun onPageSelected(position: Int) {
-      if(position == 0) {
-        getActionButton(POSITIVE).text = windowContext.getString(R.string.md_next)
-      }else{
-        getActionButton(POSITIVE).text = windowContext.getString(android.R.string.ok)
-      }
+      onViewPagerChanged(position)
     }
 
     override fun onPageScrollStateChanged(state: Int) {
@@ -103,26 +122,29 @@ fun MaterialDialog.dateTimePicker(
     checkBoxPrompt(R.string.md_all_day, isCheckedDefault = defaultAllDay) { isChecked ->
       isAllDay = isChecked
       getTimePicker().isEnabled = !isAllDay
-      if(isChecked && viewPager.currentItem != 0){
-        viewPager.currentItem = 0
+      if (isChecked && viewPager.currentItem != 0) {
+        switchPage(0)
       }
-      getPageIndicator()?.visibility = if(isChecked) View.GONE else View.VISIBLE
-      getPager()?.isCanScroll = !isAllDay
+      getPageIndicator()?.visibility = if (isChecked) View.GONE else View.VISIBLE
+      getPager()?.isCanScroll = false
+      onViewPagerChanged(viewPager.currentItem)
     }
   }
+
+  onViewPagerChanged(viewPager.currentItem)
 
   getDatePicker().apply {
     minDateTime?.let { setMinDate(it) }
     maxDateTime?.let { setMaxDate(it) }
-    currentDateTime?.let { setDate(it) }
-    addOnDateChanged { previous, date ->
+
+    init(currentDateTime ?: Calendar.getInstance()) { previous, date ->
       val futureTime = isFutureTime(getDatePicker(), getTimePicker())
       setActionButtonEnabled(
-          POSITIVE, !requireFutureDateTime || futureTime
+        POSITIVE, !requireFutureDateTime || futureTime
       )
-      if(autoFlipToTime && !isAllDay){
-        if(flipEvenSameDate || didDateChange(previous, date)){
-          viewPager.currentItem = 1
+      if (autoFlipToTime && !isAllDay) {
+        if (flipEvenSameDate || didDateChange(previous, date)) {
+          switchPage(1)
         }
       }
     }
@@ -151,7 +173,11 @@ fun MaterialDialog.dateTimePicker(
     }
   }
   negativeButton(android.R.string.cancel) {
-    dismiss()
+    if (viewPager.currentItem == 1) {
+      switchPage(0)
+    } else {
+      dismiss()
+    }
   }
 
   if (requireFutureDateTime) {

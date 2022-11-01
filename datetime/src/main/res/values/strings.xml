@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+    <string name="md_previous">PREVIOUS</string>
     <string name="md_next">NEXT</string>
     <string name="md_all_day">All day</string>
 </resources>

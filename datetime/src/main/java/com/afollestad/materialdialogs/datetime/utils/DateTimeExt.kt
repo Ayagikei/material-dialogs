@@ -16,12 +16,11 @@
 package com.afollestad.materialdialogs.datetime.utils
 
 import android.widget.TimePicker
-import com.afollestad.date.DatePicker
 import java.util.Calendar
 import java.util.GregorianCalendar
 
 internal fun isFutureTime(
-  datePicker: DatePicker,
+  datePicker: android.widget.DatePicker,
   timePicker: TimePicker
 ): Boolean {
   val now = Calendar.getInstance()
@@ -34,9 +33,9 @@ internal fun TimePicker.isFutureTime(): Boolean {
   return toCalendar().timeInMillis >= now.timeInMillis
 }
 
-internal fun DatePicker.isFutureDate(): Boolean {
+internal fun android.widget.DatePicker.isFutureDate(): Boolean {
   val now = Calendar.getInstance()
-  return getDate()!!.timeInMillis >= now.timeInMillis
+  return getDate().timeInMillis >= now.timeInMillis
 }
 
 internal fun TimePicker.toCalendar(): Calendar {
@@ -51,11 +50,54 @@ internal fun TimePicker.toCalendar(): Calendar {
 }
 
 internal fun toCalendar(
-  datePicker: DatePicker,
+  datePicker: android.widget.DatePicker,
   timePicker: TimePicker
 ): Calendar {
-  return datePicker.getDate()!!.apply {
+  return datePicker.getDate().apply {
     set(Calendar.HOUR_OF_DAY, timePicker.hour())
     set(Calendar.MINUTE, timePicker.minute())
+  }
+}
+
+internal fun android.widget.DatePicker.getDate(): Calendar {
+  val year = year
+  val month = month
+  val day = dayOfMonth
+  return GregorianCalendar(year, month, day)
+}
+
+internal fun android.widget.DatePicker.setMinDate(calendar: Calendar) {
+  minDate = calendar.timeInMillis
+}
+
+internal fun android.widget.DatePicker.setMaxDate(calendar: Calendar) {
+  maxDate = calendar.timeInMillis
+}
+
+internal fun android.widget.DatePicker.setDate(calendar: Calendar) {
+  updateDate(
+    calendar.get(Calendar.YEAR),
+    calendar.get(Calendar.MONTH),
+    calendar.get(Calendar.DAY_OF_MONTH)
+  )
+}
+
+internal fun android.widget.DatePicker.init(
+  calendar: Calendar,
+  listener: (previous: Calendar, now: Calendar) -> Unit
+) {
+  var previous = GregorianCalendar(
+    calendar.get(Calendar.YEAR),
+    calendar.get(Calendar.MONTH),
+    calendar.get(Calendar.DAY_OF_MONTH)
+  )
+  init(
+    calendar.get(Calendar.YEAR),
+    calendar.get(Calendar.MONTH),
+    calendar.get(Calendar.DAY_OF_MONTH)
+  ) { _, year, month, day ->
+    val now = GregorianCalendar(year, month, day)
+    listener(previous, now)
+    previous = now
   }
 }

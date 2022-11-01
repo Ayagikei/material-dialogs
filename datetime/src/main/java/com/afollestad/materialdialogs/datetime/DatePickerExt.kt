@@ -25,8 +25,12 @@ import com.afollestad.materialdialogs.actions.setActionButtonEnabled
 import com.afollestad.materialdialogs.callbacks.onDismiss
 import com.afollestad.materialdialogs.customview.customView
 import com.afollestad.materialdialogs.datetime.internal.TimeChangeListener
+import com.afollestad.materialdialogs.datetime.utils.getDate
 import com.afollestad.materialdialogs.datetime.utils.getDatePicker
+import com.afollestad.materialdialogs.datetime.utils.init
 import com.afollestad.materialdialogs.datetime.utils.isFutureDate
+import com.afollestad.materialdialogs.datetime.utils.setMaxDate
+import com.afollestad.materialdialogs.datetime.utils.setMinDate
 import com.afollestad.materialdialogs.utils.MDUtil.isLandscape
 import java.util.Calendar
 
@@ -56,19 +60,18 @@ fun MaterialDialog.datePicker(
   getDatePicker().apply {
     minDate?.let { setMinDate(it) }
     maxDate?.let { setMaxDate(it) }
-    currentDate?.let { setDate(it) }
 
-    addOnDateChanged { _, _ ->
+    init(currentDate ?: Calendar.getInstance()) { _, _ ->
       val isFutureDate = getDatePicker().isFutureDate()
       setActionButtonEnabled(
-          POSITIVE,
-          !requireFutureDate || isFutureDate
+        POSITIVE,
+        !requireFutureDate || isFutureDate
       )
     }
   }
 
   positiveButton(string.ok) {
-    getDatePicker().getDate()?.let { datetime ->
+    getDatePicker().getDate().let { datetime ->
       dateCallback?.invoke(it, datetime, true)
     }
   }

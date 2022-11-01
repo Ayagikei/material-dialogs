@@ -19,8 +19,6 @@ package com.afollestad.materialdialogs.datetime.utils
 
 import android.os.Build
 import android.widget.TimePicker
-import androidx.viewpager.widget.ViewPager
-import com.afollestad.date.DatePicker
 import com.afollestad.materialdialogs.MaterialDialog
 import com.afollestad.materialdialogs.datetime.R
 import com.afollestad.materialdialogs.datetime.internal.WrapContentViewPager
@@ -38,7 +36,7 @@ internal fun TimePicker.minute(value: Int) {
   if (isNougat()) minute = value else currentMinute = value
 }
 
-internal fun MaterialDialog.getDatePicker() = findViewById<DatePicker>(R.id.datetimeDatePicker)
+internal fun MaterialDialog.getDatePicker() = findViewById<android.widget.DatePicker>(R.id.datetimeDatePicker)
 
 internal fun MaterialDialog.getTimePicker() = findViewById<TimePicker>(R.id.datetimeTimePicker)
 
