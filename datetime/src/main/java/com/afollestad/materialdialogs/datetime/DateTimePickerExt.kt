@@ -32,6 +32,7 @@ import com.afollestad.materialdialogs.checkbox.checkBoxPrompt
 import com.afollestad.materialdialogs.customview.customView
 import com.afollestad.materialdialogs.datetime.internal.DateTimePickerAdapter
 import com.afollestad.materialdialogs.datetime.internal.TimeChangeListener
+import com.afollestad.materialdialogs.datetime.utils.*
 import com.afollestad.materialdialogs.datetime.utils.getDatePicker
 import com.afollestad.materialdialogs.datetime.utils.getPageIndicator
 import com.afollestad.materialdialogs.datetime.utils.getPager
@@ -143,7 +144,7 @@ fun MaterialDialog.dateTimePicker(
         POSITIVE, !requireFutureDateTime || futureTime
       )
       if (autoFlipToTime && !isAllDay) {
-        if (flipEvenSameDate || didDateChange(previous, date)) {
+        if (!didOnlyYearChange(previous, date)) {
           switchPage(1)
         }
       }
@@ -200,7 +201,21 @@ private fun didDateChange(
   to: Calendar
 ): Boolean {
   if (from == null) return false
-  return from.dayOfMonth != to.dayOfMonth
+  // judge if only year changed
+  val fromCopy = from.clone() as Calendar
+  fromCopy.year = to.year
+  return fromCopy.dayOfMonth != to.dayOfMonth
+  // return from.dayOfMonth != to.dayOfMonth
+}
+
+private fun didOnlyYearChange(
+  from: Calendar?,
+  to: Calendar
+): Boolean {
+  if (from == null) return false
+  val fromCopy = from.clone() as Calendar
+  fromCopy.year = to.year
+  return from.year != to.year && from.dayOfMonth == to.dayOfMonth && from.month == to.month
 }
 
 /**
