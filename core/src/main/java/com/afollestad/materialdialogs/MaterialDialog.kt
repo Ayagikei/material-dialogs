@@ -62,6 +62,8 @@ class MaterialDialog(
   val dialogBehavior: DialogBehavior = DEFAULT_BEHAVIOR
 ) : Dialog(windowContext, inferTheme(windowContext, dialogBehavior)) {
 
+
+
   /**
    * A named config map, used like tags for extensions.
    *
@@ -124,7 +126,9 @@ class MaterialDialog(
     invalidateBackgroundColorAndRadius()
 
     // Apply blur effect
-    applyBlurEffect()
+    if(enableBlurEffect) {
+      applyBlurEffect()
+    }
   }
 
   // referred from: libchecker/app/src/main/kotlin/com/absinthe/libchecker/ui/base/BaseAlertDialogBuilder.kt at 785dba2e7e10ae18d266df89c4693843b04403af · LibChecker/LibChecker
@@ -479,5 +483,7 @@ class MaterialDialog(
      * [MaterialDialog]. Defaults to [ModalDialog].
      */
     @JvmStatic var DEFAULT_BEHAVIOR: DialogBehavior = ModalDialog
+
+    var enableBlurEffect = true
   }
 }
