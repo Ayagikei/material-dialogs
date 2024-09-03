@@ -17,15 +17,18 @@
 
 package com.afollestad.materialdialogs
 
+import android.animation.ValueAnimator
 import android.app.Dialog
 import android.content.Context
 import android.graphics.Color.TRANSPARENT
 import android.graphics.Typeface
 import android.graphics.drawable.ColorDrawable
 import android.graphics.drawable.Drawable
+import android.os.Build
 import android.util.TypedValue
 import android.util.TypedValue.COMPLEX_UNIT_DIP
 import android.view.LayoutInflater
+import android.view.WindowManager
 import androidx.annotation.CheckResult
 import androidx.annotation.DimenRes
 import androidx.annotation.DrawableRes
@@ -36,6 +39,7 @@ import com.afollestad.materialdialogs.WhichButton.NEUTRAL
 import com.afollestad.materialdialogs.WhichButton.POSITIVE
 import com.afollestad.materialdialogs.actions.getActionButton
 import com.afollestad.materialdialogs.callbacks.invokeAll
+import com.afollestad.materialdialogs.callbacks.onShow
 import com.afollestad.materialdialogs.internal.list.DialogAdapter
 import com.afollestad.materialdialogs.internal.main.DialogLayout
 import com.afollestad.materialdialogs.list.getListAdapter
@@ -118,6 +122,37 @@ class MaterialDialog(
     this.bodyFont = font(attr = R.attr.md_font_body)
     this.buttonFont = font(attr = R.attr.md_font_button)
     invalidateBackgroundColorAndRadius()
+
+    // Apply blur effect
+    applyBlurEffect()
+  }
+
+  // referred from: libchecker/app/src/main/kotlin/com/absinthe/libchecker/ui/base/BaseAlertDialogBuilder.kt at 785dba2e7e10ae18d266df89c4693843b04403af · LibChecker/LibChecker
+  // https://source.android.com/docs/core/display/window-blurs
+  fun applyBlurEffect() {
+    if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+      this.window?.let {
+        it.addFlags(WindowManager.LayoutParams.FLAG_BLUR_BEHIND)
+        it.addFlags(WindowManager.LayoutParams.FLAG_DIM_BEHIND)
+
+        val animator = ValueAnimator.ofInt(0, 13).apply {
+          duration = 350
+          addUpdateListener { animation ->
+            if (!it.decorView.isAttachedToWindow) {
+              cancel()
+              return@addUpdateListener
+            }
+            val blurRadius = animation.animatedValue as Int * 5
+            it.attributes.blurBehindRadius = blurRadius
+            it.attributes = it.attributes
+          }
+        }
+
+        this.onShow {
+          animator.start()
+        }
+      }
+    }
   }
 
   /**

@@ -1,6 +1,6 @@
 ext.versions = [
-    min_sdk: 16,
-    compile_sdk: 29,
+    min_sdk: 21,
+    compile_sdk: 34,
     build_tools: "29.0.0",
     publish_version: "3.3.0",
     publish_version_code: 262
@@ -40,5 +40,5 @@ ext.deps = [
         date_picker: "com.afollestad:date-picker:0.6.1"
     ],
 
-    leak_canary: "com.squareup.leakcanary:leakcanary-android:2.2"
+    leak_canary: "com.squareup.leakcanary:leakcanary-android:2.14"
 ]
